@@ -32,7 +32,14 @@ jobs:
           HOST: ${{ secrets.EC2_HOST }}
           KEY: ${{ secrets.EC2_KEY }}
         run: |
+          # Save the private key to a file
           echo "$KEY" > private_key.pem
+          
+          # Set proper permissions for the private key
           chmod 600 private_key.pem
+          
+          # Copy the deployment script to the EC2 instance
           scp -i private_key.pem deploy_script.sh ec2-user@$HOST:/home/ec2-user/
+
+          # SSH into the EC2 instance and run the deployment script
           ssh -i private_key.pem ec2-user@$HOST 'bash /home/ec2-user/deploy_script.sh'
