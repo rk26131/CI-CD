@@ -26,3 +26,13 @@ jobs:
       - name: Run tests
         run: |
           pytest test_app.py
+
+      - name: Deploy to EC2
+        env:
+          HOST: ${{ secrets.EC2_HOST }}
+          KEY: ${{ secrets.EC2_KEY }}
+        run: |
+          echo "$KEY" > private_key.pem
+          chmod 600 private_key.pem
+          scp -i private_key.pem deploy_script.sh ec2-user@$HOST:/home/ec2-user/
+          ssh -i private_key.pem ec2-user@$HOST 'bash /home/ec2-user/deploy_script.sh'
